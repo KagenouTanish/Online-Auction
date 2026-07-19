@@ -1,0 +1,922 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Online Auction Platform{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @property --base-hue {
+            syntax: "<number>";
+            inherits: true;
+            initial-value: 0;
+        }
+        :root {
+            --primary: #3d2b1f;
+            --primary-dark: #2a1a10;
+            --primary-light: #6b4c3b;
+            --gradient-start: #3d2b1f;
+            --gradient-end: #6b4c3b;
+            --bg: #f5f0e8;
+            --bg-gradient: linear-gradient(160deg, #faf6f0, color-mix(in srgb, var(--accent) 10%, #f0e8d8), color-mix(in srgb, var(--accent) 15%, #e8dcc8));
+            --bg-card: linear-gradient(145deg, #fffcf8, color-mix(in srgb, var(--accent) 8%, #fff), color-mix(in srgb, var(--accent) 12%, #fff));
+            --bg-card-solid: #fffcf8;
+            --bg-navbar: linear-gradient(135deg, #3d2b1f, #6b4c3b);
+            --text-primary: #2a1a10;
+            --text-secondary: #5c4033;
+            --text-muted: #8b7355;
+            --border-color: color-mix(in srgb, var(--accent) 30%, #fff);
+            --card-shadow: 0 4px 20px color-mix(in srgb, var(--accent) 10%, transparent);
+            --card-shadow-hover: 0 12px 40px color-mix(in srgb, var(--accent) 20%, transparent);
+            --footer-bg: linear-gradient(160deg, #3d2b1f, #5c4033);
+            --footer-text: #c4b8a4;
+            --input-bg: linear-gradient(145deg, #fffcf8, color-mix(in srgb, var(--accent) 5%, #fff));
+            --input-border: color-mix(in srgb, var(--accent) 40%, #fff);
+            --alert-bg: linear-gradient(145deg, #fffcf8, color-mix(in srgb, var(--accent) 6%, #fff));
+            --dropdown-bg: linear-gradient(145deg, #fffcf8, color-mix(in srgb, var(--accent) 5%, #fff));
+            --dropdown-hover: color-mix(in srgb, var(--accent) 15%, transparent);
+            --placeholder-gradient-start: color-mix(in srgb, var(--accent) 30%, #fff);
+            --placeholder-gradient-end: color-mix(in srgb, var(--accent) 15%, #fff);
+            --trans-dur: 0.3s;
+            --speed: 0.6s;
+            --easing: cubic-bezier(0.25, 1, 0.5, 1);
+            --base-hue: 0;
+            --color-1: oklch(0.65 0.12 var(--base-hue));
+            --color-2: oklch(0.55 0.10 calc(var(--base-hue) + 120));
+            --color-3: oklch(0.75 0.08 calc(var(--base-hue) + 240));
+            --orb-opacity: 0.18;
+            --accent: #6b4c3b;
+            --card-bg: #fffcf8;
+        }
+        body.dark-mode {
+            --bg: #0a0a0a;
+            --bg-gradient: linear-gradient(160deg, #0a0a0a, color-mix(in srgb, var(--accent) 8%, #111), color-mix(in srgb, var(--accent) 5%, #0d0d0d));
+            --bg-card: linear-gradient(145deg, color-mix(in srgb, var(--accent) 12%, #1e1e1e), color-mix(in srgb, var(--accent) 8%, #141414), color-mix(in srgb, var(--accent) 6%, #0f0f0f));
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --text-muted: #777777;
+            --border-color: color-mix(in srgb, var(--accent) 20%, #333);
+            --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.6);
+            --footer-bg: linear-gradient(160deg, #050505, #111111);
+            --footer-text: #888888;
+            --input-bg: linear-gradient(145deg, color-mix(in srgb, var(--accent) 10%, #1a1a1a), color-mix(in srgb, var(--accent) 6%, #222));
+            --input-border: color-mix(in srgb, var(--accent) 25%, #444);
+            --alert-bg: linear-gradient(145deg, color-mix(in srgb, var(--accent) 10%, #1e1e1e), color-mix(in srgb, var(--accent) 6%, #141414));
+            --dropdown-bg: linear-gradient(145deg, color-mix(in srgb, var(--accent) 10%, #1a1a1a), color-mix(in srgb, var(--accent) 6%, #222));
+            --dropdown-hover: color-mix(in srgb, var(--accent) 20%, #1a1a1a);
+            --placeholder-gradient-start: color-mix(in srgb, var(--accent) 20%, #1a1a1a);
+            --placeholder-gradient-end: color-mix(in srgb, var(--accent) 10%, #1a1a1a);
+            --orb-opacity: 0.45;
+            --card-bg: color-mix(in srgb, var(--accent) 10%, #1a1a1a);
+        }
+
+        /* ── Chrome: warm beige, the default ── */
+        body.vibe-chrome   { --base-hue: 30;  --color-1: oklch(0.65 0.00 var(--base-hue)); --color-2: oklch(0.55 0.00 calc(var(--base-hue) + 120)); --color-3: oklch(0.75 0.00 calc(var(--base-hue) + 240)); --accent: #6b4c3b; }
+        /* ── Silver: warm ivory tint ── */
+        body.vibe-silver   { --base-hue: 70;  --color-1: oklch(0.72 0.08 var(--base-hue)); --color-2: oklch(0.60 0.06 calc(var(--base-hue) + 120)); --color-3: oklch(0.80 0.05 calc(var(--base-hue) + 240)); --accent: #a08050; }
+        /* ── Steel: cool blue-gray ── */
+        body.vibe-steel    { --base-hue: 230; --color-1: oklch(0.60 0.10 var(--base-hue)); --color-2: oklch(0.50 0.08 calc(var(--base-hue) + 120)); --color-3: oklch(0.70 0.06 calc(var(--base-hue) + 240)); --accent: #4466aa; }
+        /* ── Graphite: muted teal ── */
+        body.vibe-graphite { --base-hue: 170; --color-1: oklch(0.58 0.09 var(--base-hue)); --color-2: oklch(0.48 0.07 calc(var(--base-hue) + 120)); --color-3: oklch(0.68 0.06 calc(var(--base-hue) + 240)); --accent: #3a7a6a; }
+        /* ── Obsidian: deep violet ── */
+        body.vibe-obsidian { --base-hue: 290; --color-1: oklch(0.55 0.12 var(--base-hue)); --color-2: oklch(0.45 0.10 calc(var(--base-hue) + 120)); --color-3: oklch(0.65 0.08 calc(var(--base-hue) + 240)); --accent: #7744aa; }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            transition: background var(--trans-dur), color var(--trans-dur);
+            overflow-x: hidden;
+        }
+        body.dark-mode {
+            background: linear-gradient(160deg, #0c0a08, color-mix(in srgb, var(--accent) 10%, #151210), color-mix(in srgb, var(--accent) 5%, #0e0c0a));
+            background-attachment: fixed;
+        }
+
+        /* ─── Fluid Mesh Background ─── */
+        .fluid-mesh {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            filter: blur(100px);
+            z-index: 0;
+            opacity: var(--orb-opacity);
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        .orb {
+            position: absolute;
+            width: 50vmin;
+            height: 50vmin;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            translate: -50% -50%;
+        }
+        .orb-1 { background: var(--color-1); animation: orbit 12s ease-in-out infinite alternate; }
+        .orb-2 { background: var(--color-2); animation: orbit 16s ease-in-out infinite alternate-reverse; }
+        .orb-3 { background: var(--color-3); animation: orbit 20s linear infinite; }
+        @keyframes orbit {
+            0%   { transform: translate(calc(sin(0deg)*20vw),   calc(cos(0deg)*20vh))   scale(1); }
+            33%  { transform: translate(calc(sin(120deg)*25vw), calc(cos(120deg)*15vh)) scale(1.5); }
+            66%  { transform: translate(calc(sin(240deg)*15vw), calc(cos(240deg)*25vh)) scale(0.8); }
+            100% { transform: translate(calc(sin(360deg)*20vw), calc(cos(360deg)*20vh)) scale(1); }
+        }
+
+        body.dark-mode::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at center, rgba(80,80,80,0.15) 0%, #050505 100%);
+        }
+
+        /* ─── Navbar: z-index above everything ─── */
+        .navbar-custom {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent) 70%, transparent));
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1100;
+            backdrop-filter: blur(12px);
+        }
+        body.dark-mode .navbar-custom {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 40%, #0a0a0a), color-mix(in srgb, var(--accent) 25%, #0a0a0a));
+        }
+        .navbar-custom.sticky-top {
+            position: sticky;
+            z-index: 1100;
+        }
+        .navbar-custom .navbar-brand {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+        .navbar-custom .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 0.5rem 1rem;
+        }
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.active {
+            color: #fff !important;
+        }
+        .navbar-custom .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .navbar-custom .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Dropdown menus must escape navbar stacking context */
+        .navbar-custom .dropdown-menu {
+            z-index: 1200;
+        }
+
+        main {
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero-gradient {
+            position: relative;
+            padding: 4rem 0;
+            overflow: hidden;
+        }
+        .glass-prism {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 3rem 3.5rem;
+            border-radius: 24px;
+            background: color-mix(in srgb, var(--accent) 12%, transparent);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+            box-shadow: 0 30px 60px color-mix(in srgb, var(--accent) 15%, transparent);
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            text-align: center;
+        }
+        .glass-prism:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+        }
+        .glass-prism .badge {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: color-mix(in srgb, var(--accent) 15%, transparent);
+            color: var(--accent);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+            margin-bottom: 1rem;
+        }
+        .gradient-text {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 0.5rem 0 1rem;
+            background: linear-gradient(135deg, var(--color-1), var(--color-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+        .glass-prism .lead {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 2rem;
+        }
+        body:not(.dark-mode) .glass-prism .lead {
+            color: var(--text-secondary);
+        }
+        body:not(.dark-mode) .glass-prism {
+            border-color: color-mix(in srgb, var(--accent) 25%, #fff);
+        }
+        .btn-outline-light {
+            border-color: rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.9);
+        }
+        .btn-outline-light:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.7);
+            color: #fff;
+        }
+        body:not(.dark-mode) .btn-outline-light {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        body:not(.dark-mode) .btn-outline-light:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000));
+            border: none;
+            color: #fffcf8;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 80%, #000), var(--accent));
+            color: #fffcf8;
+        }
+        .card-auction {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: var(--bg-card);
+        }
+        .card-auction:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .card-auction .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        /* ─── Expanding Accordion Cards (Featured) ─── */
+        .auction-accordion {
+            display: grid;
+            grid-template-columns: 10fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 8px;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 8px;
+            height: clamp(300px, 40dvh, 474px);
+            width: 100%;
+            max-width: 100%;
+            transition: grid-template-columns var(--speed, 0.6s) var(--easing, ease);
+        }
+        @media (max-width: 768px) {
+            .auction-accordion {
+                grid-template-columns: 1fr 1fr;
+                height: auto;
+            }
+            .accordion-item-card {
+                min-height: 220px;
+            }
+        }
+        .accordion-item-card {
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        .accordion-item-card:hover {
+            border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+        }
+        .accordion-item-card img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(1) brightness(0.6);
+            scale: 1.1;
+            transition-property: filter, scale;
+            transition-duration: calc(var(--speed, 0.6s) * 1.2);
+            transition-timing-function: var(--easing, ease);
+            pointer-events: none;
+        }
+        .accordion-item-card[data-active="true"] img {
+            filter: grayscale(0) brightness(0.55);
+            scale: 1;
+            transition-delay: calc(var(--speed, 0.6s) * 0.25);
+        }
+        .accordion-item-card .card-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem;
+            pointer-events: none;
+        }
+        .accordion-item-card .card-overlay h3 {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            transform-origin: 0 50%;
+            rotate: -90deg;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            color: #fff;
+            opacity: 0.6;
+            transition: opacity calc(var(--speed, 0.6s) * 1.2) var(--easing, ease);
+        }
+        .accordion-item-card[data-active="true"] .card-overlay h3 {
+            opacity: 0;
+        }
+        .accordion-item-card .card-overlay .overlay-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            opacity: 0;
+            transition: opacity calc(var(--speed, 0.6s) * 1.2) var(--easing, ease);
+        }
+        .accordion-item-card .card-overlay .overlay-meta {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+            opacity: 0;
+            transition: opacity calc(var(--speed, 0.6s) * 1.2) var(--easing, ease);
+            margin-top: 0.3rem;
+        }
+        .accordion-item-card .card-overlay .overlay-link {
+            display: inline-block;
+            margin-top: 0.6rem;
+            padding: 6px 16px;
+            border-radius: 6px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            pointer-events: auto;
+            width: fit-content;
+            opacity: 0;
+            transition: opacity calc(var(--speed, 0.6s) * 1.2) var(--easing, ease);
+        }
+        .accordion-item-card[data-active="true"] .card-overlay .overlay-price,
+        .accordion-item-card[data-active="true"] .card-overlay .overlay-meta,
+        .accordion-item-card[data-active="true"] .card-overlay .overlay-link {
+            opacity: 1;
+            transition-delay: calc(var(--speed, 0.6s) * 0.25);
+        }
+        .accordion-item-card .placeholder-acc {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--placeholder-gradient-start), var(--placeholder-gradient-end));
+            pointer-events: none;
+        }
+        .accordion-item-card .placeholder-acc i {
+            font-size: 2rem;
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+        .accordion-item-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .price-tag {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        body.dark-mode .price-tag {
+            color: #f0f0f0;
+        }
+        .time-badge {
+            background: var(--accent);
+            color: #fffcf8;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .section-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        footer {
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent) 70%, transparent));
+            backdrop-filter: blur(12px);
+            color: rgba(255,255,255,0.8);
+            margin-top: auto;
+        }
+        body.dark-mode footer {
+            background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 30%, #0a0a0a), color-mix(in srgb, var(--accent) 20%, #0a0a0a));
+        }
+        footer a {
+            color: #cccccc;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: #ffffff;
+        }
+        .badge-active {
+            background: var(--accent);
+            color: #fffcf8;
+        }
+        .badge-ended {
+            background-color: #8b7355;
+            color: #fffcf8;
+        }
+        body.dark-mode .badge-active {
+            background: color-mix(in srgb, var(--accent) 70%, #fff);
+            color: #111;
+        }
+        body.dark-mode .badge-ended {
+            background-color: #555;
+            color: #fff;
+        }
+        .badge.bg-warning.text-dark { color: #1f2937 !important; }
+        body.dark-mode .badge.bg-warning.text-dark { color: #1f2937 !important; background-color: #f59e0b !important; }
+        .placeholder-img {
+            background: linear-gradient(135deg, var(--placeholder-gradient-start), var(--placeholder-gradient-end));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #999;
+        }
+        .dropdown-menu {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            background: var(--dropdown-bg);
+        }
+        .dropdown-item {
+            color: var(--text-primary);
+        }
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background-color: var(--dropdown-hover);
+            color: var(--text-primary);
+        }
+        .bg-white { background: var(--bg-card) !important; }
+        .text-dark { color: var(--text-primary) !important; }
+        .text-muted { color: var(--text-secondary) !important; }
+        .text-body { color: var(--text-primary) !important; }
+        .alert { background: var(--alert-bg); color: var(--text-primary); border-color: var(--border-color); }
+        .form-control, .form-select {
+            background: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-primary);
+        }
+        .form-control:focus, .form-select:focus {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--accent) 20%, transparent);
+        }
+        body.dark-mode .form-control:focus, body.dark-mode .form-select:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.1);
+        }
+        .card { background: var(--bg-card); color: var(--text-primary); }
+        .card-header { background: var(--bg-card); color: var(--text-primary); border-bottom-color: var(--border-color); }
+        .card-footer { background: var(--bg-card); }
+        .table { color: var(--text-primary); }
+        .table > :not(caption) > * > * { background-color: transparent; color: var(--text-primary); border-bottom-color: var(--border-color); }
+        .table-light { background: var(--bg-card); }
+        .breadcrumb { background-color: transparent; }
+        .breadcrumb-item a { color: var(--accent); }
+        .breadcrumb-item.active { color: var(--text-muted); }
+        .breadcrumb-item + .breadcrumb-item::before { color: var(--text-muted); }
+        .page-link { color: #5c4033; }
+        .page-item.active .page-link { background-color: var(--accent); border-color: var(--accent); }
+        body.dark-mode .page-link { color: #ccc; }
+        body.dark-mode .page-item.active .page-link { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+        .modal-content { background: var(--bg-card); color: var(--text-primary); }
+
+        /* ─── Vibe Dropdown ─── */
+        .vibe-dropdown .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .vibe-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            transition: background 0.4s, box-shadow 0.4s;
+        }
+        .vibe-dot.v-chrome   { background: #6b4c3b;  box-shadow: 0 0 6px #6b4c3b; }
+        .vibe-dot.v-silver   { background: #d4a857;  box-shadow: 0 0 6px #d4a857; }
+        .vibe-dot.v-steel    { background: #4466aa;  box-shadow: 0 0 6px #4466aa; }
+        .vibe-dot.v-graphite { background: #3a7a6a;  box-shadow: 0 0 6px #3a7a6a; }
+        .vibe-dot.v-obsidian { background: #7744aa;  box-shadow: 0 0 6px #7744aa; }
+        .vibe-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+        }
+        .vibe-dropdown .dropdown-item.active-vibe {
+            background-color: var(--dropdown-hover);
+            font-weight: 600;
+        }
+        .vibe-dropdown .dropdown-item.active-vibe::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: auto;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* ─── Dark Mode Toggle Switch ─── */
+        .switch {
+            margin-left: 12px;
+            position: relative;
+        }
+        .switch__icon,
+        .switch__input {
+            display: block;
+        }
+        .switch__icon {
+            position: absolute;
+            top: 0.375em;
+            right: 0.375em;
+            width: 0.75em;
+            height: 0.75em;
+            transition:
+                opacity calc(var(--trans-dur) / 2),
+                transform calc(var(--trans-dur) / 2);
+            pointer-events: none;
+        }
+        .switch__icon polyline {
+            transition: stroke-dashoffset calc(var(--trans-dur) / 2);
+        }
+        .switch__icon--light,
+        .switch__icon--light polyline {
+            transition-delay: calc(var(--trans-dur) / 2);
+            transition-timing-function: cubic-bezier(0.05,0.76,0.06,0.86);
+        }
+        .switch__icon--dark {
+            opacity: 0;
+            transform: translateX(-0.75em) rotate(30deg) scale(0.75);
+            transition-timing-function: cubic-bezier(0.76,0.05,0.86,0.06);
+        }
+        .switch__input {
+            background-color: #555;
+            border-radius: 0.75em;
+            box-shadow:
+                0 0 0 0.125em rgba(0,0,0,0),
+                0.125em 0.125em 0.25em rgba(0,0,0,0.2);
+            outline: transparent;
+            position: relative;
+            width: 3em;
+            height: 1.5em;
+            -webkit-appearance: none;
+            appearance: none;
+            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+            transition:
+                background-color var(--trans-dur) cubic-bezier(0.76,0.05,0.24,0.95),
+                box-shadow 0.15s linear;
+        }
+        .switch__input:focus-visible {
+            box-shadow:
+                0 0 0 0.125em rgba(255,255,255,0.3),
+                0.125em 0.125em 0.25em rgba(0,0,0,0.2);
+        }
+        .switch__input::before,
+        .switch__input::after {
+            content: "";
+            display: block;
+            position: absolute;
+        }
+        .switch__input::before {
+            background-color: #f59e0b;
+            border-radius: inherit;
+            mask-image: linear-gradient(120deg, hsl(0,0%,0%) 20%, hsla(0,0%,0%,0) 80%);
+            -webkit-mask-image: linear-gradient(120deg, hsl(0,0%,0%) 20%, hsla(0,0%,0%,0) 80%);
+            inset: 0;
+            transition: background-color var(--trans-dur) cubic-bezier(0.76,0.05,0.24,0.95);
+        }
+        .switch__input::after {
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0.05em 0.05em 0.05em rgba(0,0,0,0.1);
+            top: 0.125em;
+            left: 0.125em;
+            width: 1.25em;
+            height: 1.25em;
+            transition:
+                background-color var(--trans-dur) cubic-bezier(0.76,0.05,0.24,0.95),
+                transform var(--trans-dur) cubic-bezier(0.76,0.05,0.24,0.95);
+            z-index: 1;
+        }
+        .switch__input:checked {
+            background-color: var(--accent);
+        }
+        .switch__input:checked::before {
+            background-color: var(--accent);
+        }
+        .switch__input:checked::after {
+            background-color: #111111;
+            transform: translateX(1.5em);
+        }
+        .switch__input:checked ~ .switch__icon--light,
+        .switch__input:checked ~ .switch__icon--light polyline {
+            transition-delay: 0s;
+            transition-timing-function: cubic-bezier(0.76,0.05,0.86,0.06);
+        }
+        .switch__input:checked ~ .switch__icon--light {
+            opacity: 0;
+            transform: translateX(-0.75em) rotate(-30deg) scale(0.75);
+        }
+        .switch__input:checked ~ .switch__icon--light polyline {
+            stroke-dashoffset: 1.5;
+        }
+        .switch__input:checked ~ .switch__icon--dark {
+            opacity: 1;
+            transform: translateX(-1.5em);
+            transition-delay: calc(var(--trans-dur) / 2);
+            transition-timing-function: cubic-bezier(0.05,0.76,0.06,0.86);
+        }
+        .switch__sr {
+            overflow: hidden;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="vibe-chrome">
+
+    <div class="fluid-mesh">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-gavel me-2"></i>AuctionHub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'auction_list' %}"><i class="fas fa-gavel me-1"></i> Auctions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'category_list' %}"><i class="fas fa-th-large me-1"></i> Categories</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav align-items-center">
+                    <!-- Vibe Selector Dropdown -->
+                    <li class="nav-item dropdown vibe-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="vibe-dot v-chrome" id="vibeDot"></span>
+                            <span class="d-none d-md-inline">Vibe</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item active-vibe" href="#" data-vibe="vibe-chrome"><span class="vibe-dot v-chrome"></span> Chrome</a></li>
+                            <li><a class="dropdown-item" href="#" data-vibe="vibe-silver"><span class="vibe-dot v-silver"></span> Silver</a></li>
+                            <li><a class="dropdown-item" href="#" data-vibe="vibe-steel"><span class="vibe-dot v-steel"></span> Steel</a></li>
+                            <li><a class="dropdown-item" href="#" data-vibe="vibe-graphite"><span class="vibe-dot v-graphite"></span> Graphite</a></li>
+                            <li><a class="dropdown-item" href="#" data-vibe="vibe-obsidian"><span class="vibe-dot v-obsidian"></span> Obsidian</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dark Mode Toggle -->
+                    <li class="nav-item">
+                        <label class="switch" style="margin:0;">
+                            <input class="switch__input" type="checkbox" role="switch" id="darkModeToggle">
+                            <svg class="switch__icon switch__icon--light" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
+                                <g fill="none" stroke="#fff" stroke-width="1" stroke-linecap="round">
+                                    <circle cx="6" cy="6" r="2" />
+                                    <g stroke-dasharray="1.5 1.5">
+                                        <polyline points="6 10,6 11.5" transform="rotate(0,6,6)" />
+                                        <polyline points="6 10,6 11.5" transform="rotate(45,6,6)" />
+                                        <polyline points="6 10,6 11.5" transform="rotate(90,6,6)" />
+                                        <polyline points="6 10,6 11.5" transform="rotate(135,6,6)" />
+                                        <polyline points="6 10,6 11.5" transform="rotate(180,6,6)" />
+                                        <polyline points="6 10,6 11.5" transform="rotate(225,6,6)" />
+                                        <polyline points="6 10,6 11.5" transform="rotate(270,6,6)" />
+                                        <polyline points="6 10,6 11.5" transform="rotate(315,6,6)" />
+                                    </g>
+                                </g>
+                            </svg>
+                            <svg class="switch__icon switch__icon--dark" viewBox="0 0 12 12" width="12px" height="12px" aria-hidden="true">
+                                <g fill="none" stroke="#fff" stroke-width="1" stroke-linejoin="round" transform="rotate(-45,6,6)">
+                                    <path d="m9,10c-2.209,0-4-1.791-4-4s1.791-4,4-4c.304,0,.598.041.883.105-.995-.992-2.367-1.605-3.883-1.605C2.962.5.5,2.962.5,6s2.462,5.5,5.5,5.5c1.516,0,2.888-.613,3.883-1.605-.285.058-.578.105-.883.105Z"/>
+                                </g>
+                            </svg>
+                            <span class="switch__sr">Dark Mode</span>
+                        </label>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                        {% if user.profile.is_seller %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'auction_create' %}"><i class="fas fa-plus-circle me-1"></i> New Auction</a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'payment_history' %}"><i class="fas fa-credit-card me-2"></i>Payments</a></li>
+                                <li><a class="dropdown-item" href="{% url 'my_bid_reports' %}"><i class="fas fa-chart-line me-2"></i>My Bids</a></li>
+                                {% if user.profile.is_seller %}
+                                <li><a class="dropdown-item" href="{% url 'my_auctions' %}"><i class="fas fa-list me-2"></i>My Auctions</a></li>
+                                <li><a class="dropdown-item" href="{% url 'my_listings' %}"><i class="fas fa-store me-2"></i>My Listings</a></li>
+                                <li><a class="dropdown-item" href="{% url 'seller_reports' %}"><i class="fas fa-chart-bar me-2"></i>Seller Reports</a></li>
+                                {% endif %}
+                                {% if user.is_staff %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'auction_reports' %}"><i class="fas fa-chart-pie me-2"></i>Auction Reports</a></li>
+                                <li><a class="dropdown-item" href="{% url 'user_reports' %}"><i class="fas fa-users me-2"></i>User Reports</a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="fas fa-cog me-2"></i>Django Admin</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus me-1"></i> Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="container mt-3" style="position:relative;z-index:10;">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {% if message.tags == 'success' %}<i class="fas fa-check-circle me-2"></i>{% endif %}
+            {% if message.tags == 'error' %}<i class="fas fa-exclamation-circle me-2"></i>{% endif %}
+            {% if message.tags == 'warning' %}<i class="fas fa-exclamation-triangle me-2"></i>{% endif %}
+            {% if message.tags == 'info' %}<i class="fas fa-info-circle me-2"></i>{% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-white"><i class="fas fa-gavel me-2"></i>AuctionHub</h5>
+                    <p class="small">Your trusted online auction platform. Buy and sell with confidence.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-white">Quick Links</h6>
+                    <ul class="list-unstyled small">
+                        <li><a href="{% url 'home' %}">Home</a></li>
+                        <li><a href="{% url 'auction_list' %}">Browse Auctions</a></li>
+                        <li><a href="{% url 'category_list' %}">Categories</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-white">Connect</h6>
+                    <div>
+                        <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <p class="text-center small mb-0">&copy; 2026 AuctionHub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            var body = document.body;
+
+            /* ─── Dark Mode ─── */
+            var dmToggle = document.getElementById('darkModeToggle');
+            var dmSaved = localStorage.getItem('darkMode');
+            if (dmSaved === 'true') {
+                body.classList.add('dark-mode');
+                dmToggle.checked = true;
+            }
+            dmToggle.addEventListener('change', function() {
+                body.classList.toggle('dark-mode', this.checked);
+                localStorage.setItem('darkMode', this.checked);
+            });
+
+            /* ─── Vibe Selector ─── */
+            var vibes = ['vibe-chrome','vibe-silver','vibe-steel','vibe-graphite','vibe-obsidian'];
+            var vibeItems = document.querySelectorAll('.vibe-dropdown .dropdown-item[data-vibe]');
+            var vibeDot = document.getElementById('vibeDot');
+            var savedVibe = localStorage.getItem('vibe') || 'vibe-chrome';
+
+            function applyVibe(vibe) {
+                vibes.forEach(function(v) { body.classList.remove(v); });
+                body.classList.add(vibe);
+                localStorage.setItem('vibe', vibe);
+                vibeDot.className = 'vibe-dot ' + vibe.replace('vibe-','v-');
+                vibeItems.forEach(function(item) {
+                    item.classList.toggle('active-vibe', item.dataset.vibe === vibe);
+                });
+            }
+            applyVibe(savedVibe);
+
+            vibeItems.forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    applyVibe(this.dataset.vibe);
+                });
+            });
+        })();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

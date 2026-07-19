@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Auctions - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-filter me-2"></i>Filters</h5>
+
+                    <form method="GET" action="{% url 'auction_list' %}">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Search</label>
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Search auctions..." value="{{ search|default:'' }}">
+                                <button class="btn btn-primary-custom text-white" type="submit"><i class="fas fa-search"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Category</label>
+                            <select name="category" class="form-select" onchange="this.form.submit()">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Sort By</label>
+                            <select name="sort" class="form-select" onchange="this.form.submit()">
+                                <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                                <option value="ending_soon" {% if current_sort == 'ending_soon' %}selected{% endif %}>Ending Soon</option>
+                                <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                            </select>
+                        </div>
+
+                        {% if search or selected_category %}
+                        <a href="{% url 'auction_list' %}" class="btn btn-outline-secondary w-100 btn-sm">
+                            <i class="fas fa-times me-1"></i>Clear Filters
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="section-title mb-0">Auctions</h2>
+                <span class="text-muted">{{ total_count }} item{{ total_count|pluralize }}</span>
+            </div>
+
+            {% if auction_chunks %}
+                {% for chunk in auction_chunks %}
+                <ul class="auction-accordion" data-accordion-row>
+                    {% for auction in chunk %}
+                    <li class="accordion-item-card" data-active="{% if forloop.first %}true{% else %}false{% endif %}">
+                        {% if auction.image %}
+                        <img src="{{ auction.image.url }}" alt="{{ auction.title }}">
+                        {% else %}
+                        <div class="placeholder-acc"><i class="fas fa-image"></i></div>
+                        {% endif %}
+                        <div class="card-overlay">
+                            <h3>{{ auction.title }}</h3>
+                            <div class="overlay-price">${{ auction.current_price }}</div>
+                            <div class="overlay-meta">
+                                {% if auction.is_active %}<span class="me-2"><i class="fas fa-clock me-1"></i>{{ auction.end_time|date:"M d, Y" }}</span>{% else %}<span class="me-2">Ended</span>{% endif %}
+                                <span>{{ auction.bids.count }} bids</span>
+                            </div>
+                            <a href="{% url 'auction_detail' slug=auction.slug %}" class="overlay-link">Bid Now</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endfor %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No auctions found</h4>
+                <p class="text-muted">Try adjusting your search or filter criteria.</p>
+                <a href="{% url 'auction_list' %}" class="btn btn-primary-custom text-white">Clear Filters</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+    var lists = document.querySelectorAll('[data-accordion-row]');
+    lists.forEach(function(list) {
+        var items = list.querySelectorAll('.accordion-item-card');
+        var count = items.length;
+
+        function setCols(idx) {
+            var cols = [];
+            for (var i = 0; i < count; i++) {
+                items[i].dataset.active = (i === idx).toString();
+                cols.push(i === idx ? '10fr' : '1fr');
+            }
+            list.style.gridTemplateColumns = cols.join(' ');
+        }
+
+        list.addEventListener('pointermove', function(e) {
+            var card = e.target.closest('.accordion-item-card');
+            if (!card || card.parentElement !== list) return;
+            var idx = Array.prototype.indexOf.call(items, card);
+            setCols(idx);
+        });
+
+        list.addEventListener('click', function(e) {
+            var card = e.target.closest('.accordion-item-card');
+            if (!card || card.parentElement !== list) return;
+            var idx = Array.prototype.indexOf.call(items, card);
+            setCols(idx);
+        });
+
+        setCols(0);
+    });
+})();
+</script>
+{% endblock %}

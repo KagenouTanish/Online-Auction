@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        {% if user.profile.profile_image %}
+                        <img src="{{ user.profile.profile_image.url }}" alt="Profile" class="rounded-circle me-3" style="width:80px; height:80px; object-fit:cover;">
+                        {% else %}
+                        <div class="bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle me-3" style="width:80px; height:80px;">
+                            <i class="fas fa-user fa-2x text-primary"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h3 class="mb-0">{{ user.get_full_name|default:user.username }}</h3>
+                            <span class="text-muted">@{{ user.username }}</span>
+                            <div class="mt-1">
+                                <span class="badge bg-primary">Member since {{ user.date_joined|date:"M Y" }}</span>
+                                {% if user.profile.is_seller %}
+                                <span class="badge bg-success">Seller</span>
+                                {% endif %}
+                                {% if user.is_staff %}
+                                <span class="badge bg-warning text-dark">Staff</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">My Auctions</small>
+                                <div class="fw-bold fs-5">{{ user.auctions.count }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Total Bids</small>
+                                <div class="fw-bold fs-5">{{ user.bids.count }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Payments</small>
+                                <div class="fw-bold fs-5">{{ user.payments_made.count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h4 class="mb-4"><i class="fas fa-edit me-2"></i>Edit Profile</h4>
+
+                    {% if u_form.errors or p_form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        Please correct the errors below.
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <h5 class="text-muted mb-3">Account Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ u_form.username.id_for_label }}" class="form-label fw-semibold">Username</label>
+                                <input type="text" name="username" class="form-control {% if u_form.username.errors %}is-invalid{% endif %}" id="{{ u_form.username.id_for_label }}" value="{{ u_form.username.value|default:'' }}" required>
+                                {% for error in u_form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ u_form.email.id_for_label }}" class="form-label fw-semibold">Email</label>
+                                <input type="email" name="email" class="form-control {% if u_form.email.errors %}is-invalid{% endif %}" id="{{ u_form.email.id_for_label }}" value="{{ u_form.email.value|default:'' }}" required>
+                                {% for error in u_form.email.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ u_form.first_name.id_for_label }}" class="form-label fw-semibold">First Name</label>
+                                <input type="text" name="first_name" class="form-control {% if u_form.first_name.errors %}is-invalid{% endif %}" id="{{ u_form.first_name.id_for_label }}" value="{{ u_form.first_name.value|default:'' }}">
+                                {% for error in u_form.first_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ u_form.last_name.id_for_label }}" class="form-label fw-semibold">Last Name</label>
+                                <input type="text" name="last_name" class="form-control {% if u_form.last_name.errors %}is-invalid{% endif %}" id="{{ u_form.last_name.id_for_label }}" value="{{ u_form.last_name.value|default:'' }}">
+                                {% for error in u_form.last_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h5 class="text-muted mb-3">Profile Details</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ p_form.phone.id_for_label }}" class="form-label fw-semibold">Phone</label>
+                                <input type="text" name="phone" class="form-control {% if p_form.phone.errors %}is-invalid{% endif %}" id="{{ p_form.phone.id_for_label }}" value="{{ p_form.phone.value|default:'' }}">
+                                {% for error in p_form.phone.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ p_form.profile_image.id_for_label }}" class="form-label fw-semibold">Profile Image</label>
+                                <input type="file" name="profile_image" class="form-control {% if p_form.profile_image.errors %}is-invalid{% endif %}" id="{{ p_form.profile_image.id_for_label }}" accept="image/*">
+                                {% for error in p_form.profile_image.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ p_form.address.id_for_label }}" class="form-label fw-semibold">Address</label>
+                            <input type="text" name="address" class="form-control {% if p_form.address.errors %}is-invalid{% endif %}" id="{{ p_form.address.id_for_label }}" value="{{ p_form.address.value|default:'' }}">
+                            {% for error in p_form.address.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ p_form.city.id_for_label }}" class="form-label fw-semibold">City</label>
+                                <input type="text" name="city" class="form-control {% if p_form.city.errors %}is-invalid{% endif %}" id="{{ p_form.city.id_for_label }}" value="{{ p_form.city.value|default:'' }}">
+                                {% for error in p_form.city.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ p_form.state.id_for_label }}" class="form-label fw-semibold">State</label>
+                                <input type="text" name="state" class="form-control {% if p_form.state.errors %}is-invalid{% endif %}" id="{{ p_form.state.id_for_label }}" value="{{ p_form.state.value|default:'' }}">
+                                {% for error in p_form.state.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ p_form.zip_code.id_for_label }}" class="form-label fw-semibold">Zip Code</label>
+                                <input type="text" name="zip_code" class="form-control {% if p_form.zip_code.errors %}is-invalid{% endif %}" id="{{ p_form.zip_code.id_for_label }}" value="{{ p_form.zip_code.value|default:'' }}">
+                                {% for error in p_form.zip_code.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4 form-check form-switch">
+                            <input type="checkbox" name="is_seller" class="form-check-input" id="{{ p_form.is_seller.id_for_label }}" {% if p_form.is_seller.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ p_form.is_seller.id_for_label }}">
+                                <strong>Seller Account</strong>
+                                <small class="text-muted d-block">Enable selling functionality</small>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-custom text-white px-4">
+                            <i class="fas fa-save me-1"></i>Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

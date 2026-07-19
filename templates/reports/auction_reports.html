@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Auction Reports - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="section-title mb-4"><i class="fas fa-chart-bar me-2"></i>Auction Reports</h2>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:60px; height:60px;">
+                        <i class="fas fa-gavel fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_auctions }}</h3>
+                    <p class="text-muted mb-0">Total Auctions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:60px; height:60px;">
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ active_auctions }}</h3>
+                    <p class="text-muted mb-0">Active Auctions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:60px; height:60px;">
+                        <i class="fas fa-hand-paper fa-2x text-warning"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_bids }}</h3>
+                    <p class="text-muted mb-0">Total Bids</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-info bg-opacity-10 d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:60px; height:60px;">
+                        <i class="fas fa-dollar-sign fa-2x text-info"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">${{ total_revenue }}</h3>
+                    <p class="text-muted mb-0">Total Revenue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-chart-pie me-2"></i>Auction Status Breakdown</h5>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Active</span>
+                            <span class="fw-semibold">{{ active_auctions }}</span>
+                        </div>
+                        <div class="progress" style="height:20px;">
+                            <div class="progress-bar bg-success" style="width:{% widthratio active_auctions total_auctions 100 %}%">
+                                {% widthratio active_auctions total_auctions 100 %}%
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Ended</span>
+                            <span class="fw-semibold">{{ ended_auctions }}</span>
+                        </div>
+                        <div class="progress" style="height:20px;">
+                            <div class="progress-bar bg-secondary" style="width:{% widthratio ended_auctions total_auctions 100 %}%">
+                                {% widthratio ended_auctions total_auctions 100 %}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-info-circle me-2"></i>Summary</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total Auctions</span>
+                            <strong>{{ total_auctions }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Active Auctions</span>
+                            <strong class="text-success">{{ active_auctions }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Ended Auctions</span>
+                            <strong class="text-secondary">{{ ended_auctions }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total Bids Placed</span>
+                            <strong>{{ total_bids }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total Revenue</span>
+                            <strong class="text-primary">${{ total_revenue }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

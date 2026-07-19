@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="section-title mb-4"><i class="fas fa-th-large me-2"></i>Categories</h2>
+
+    {% if categories %}
+    <div class="row g-4">
+        {% for category in categories %}
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'category_detail' slug=category.slug %}" class="text-decoration-none" style="display:block; height:100%;">
+                <div class="card card-auction h-100">
+                    <div class="card-body text-center py-4">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width:70px; height:70px; background: var(--dropdown-hover);">
+                            <i class="fas fa-tag fa-2x" style="color: var(--text-primary);"></i>
+                        </div>
+                        <h4 class="card-title" style="color: var(--text-primary);">{{ category.name }}</h4>
+                        {% if category.description %}
+                        <p class="card-text" style="color: var(--text-secondary);">{{ category.description|truncatewords:15 }}</p>
+                        {% endif %}
+                        <span class="badge bg-primary fs-6">{{ category.auctions.count }} item{{ category.auctions.count|pluralize }}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-folder-open fa-3x mb-3" style="color: var(--text-muted);"></i>
+        <h4 style="color: var(--text-muted);">No categories available</h4>
+        <p style="color: var(--text-muted);">Categories will appear here once they are created.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

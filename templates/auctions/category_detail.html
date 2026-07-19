@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'category_list' %}">Categories</a></li>
+            <li class="breadcrumb-item active">{{ category.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="mb-4">
+        <h2 class="section-title">{{ category.name }}</h2>
+        {% if category.description %}
+        <p class="mt-3" style="color: var(--text-secondary);">{{ category.description }}</p>
+        {% endif %}
+    </div>
+
+    {% if auctions %}
+    <div class="row g-4">
+        {% for auction in auctions %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card card-auction h-100">
+                {% if auction.image %}
+                <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.title }}">
+                {% else %}
+                <div class="placeholder-img" style="height:160px;">
+                    <i class="fas fa-image fa-2x"></i>
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title" style="color: var(--text-primary);">{{ auction.title|truncatewords:5 }}</h6>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-end">
+                            <div>
+                                <small style="color: var(--text-muted);" class="d-block">Current Price</small>
+                                <span class="price-tag">${{ auction.current_price }}</span>
+                            </div>
+                            <span class="time-badge"><i class="fas fa-clock me-1"></i>{{ auction.end_time|date:"M d" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer border-0 pb-3" style="background: var(--bg-card);">
+                    <a href="{% url 'auction_detail' slug=auction.slug %}" class="btn btn-primary-custom w-100 text-white btn-sm">View & Bid</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-inbox fa-3x mb-3" style="color: var(--text-muted);"></i>
+        <h4 style="color: var(--text-muted);">No active auctions in this category</h4>
+        <p style="color: var(--text-muted);">Check back later for new listings.</p>
+        <a href="{% url 'auction_list' %}" class="btn btn-primary-custom text-white">Browse All Auctions</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

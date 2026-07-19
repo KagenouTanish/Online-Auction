@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ auction.title }} - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'auction_list' %}">Auctions</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'category_detail' slug=auction.category.slug %}">{{ auction.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ auction.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm" style="background:var(--card-bg);">
+                {% if auction.image %}
+                <img src="{{ auction.image.url }}" class="card-img-top" style="max-height:500px; object-fit:cover;" alt="{{ auction.title }}">
+                {% else %}
+                <div class="placeholder-img" style="height:400px;">
+                    <i class="fas fa-image fa-5x"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="card border-0 shadow-sm mt-4" style="background:var(--card-bg);">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Description</h4>
+                    <p class="text-muted">{{ auction.description|linebreaksbr }}</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mt-4" style="background:var(--card-bg);">
+                <div class="card-body">
+                    <h4 class="card-title mb-3"><i class="fas fa-history me-2"></i>Bid History</h4>
+                    {% if bids %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead style="background:var(--dropdown-hover);">
+                                <tr>
+                                    <th>Bidder</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bid in bids %}
+                                <tr {% if forloop.first %}style="background:color-mix(in srgb, var(--accent) 12%, transparent);"{% endif %}>
+                                    <td>
+                                        <i class="fas fa-user-circle me-1"></i>
+                                        {{ bid.bidder.username }}
+                                        {% if forloop.first %}<span class="badge bg-success ms-1">Highest</span>{% endif %}
+                                    </td>
+                                    <td class="fw-bold">${{ bid.amount }}</td>
+                                    <td>{{ bid.created_at|date:"M d, Y H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-gavel fa-2x mb-2"></i>
+                        <p>No bids yet. Be the first to bid!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm sticky-top" style="top:80px; background:var(--card-bg);">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-primary mb-2">{{ auction.category.name }}</span>
+                        {% if auction.is_active %}
+                        <span class="badge badge-active mb-2">Active</span>
+                        {% else %}
+                        <span class="badge badge-ended mb-2">Ended</span>
+                        {% endif %}
+                        {% if auction.is_featured %}
+                        <span class="badge bg-warning text-dark mb-2"><i class="fas fa-star"></i> Featured</span>
+                        {% endif %}
+                    </div>
+
+                    <h3 class="fw-bold">{{ auction.title }}</h3>
+
+                    <div class="mb-3">
+                        <small class="text-muted">Listed by</small>
+                        <div><i class="fas fa-user me-1"></i> {{ auction.seller.username }}</div>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center mb-4">
+                        <small class="text-muted d-block">Current Bid</small>
+                        <div class="display-6 fw-bold text-primary">${{ auction.current_price }}</div>
+                        <small class="text-muted">Starting: ${{ auction.starting_price }}</small>
+                    </div>
+
+                    <div class="row text-center mb-4">
+                        <div class="col-6">
+                            <div class="p-3 rounded" style="background:var(--dropdown-hover);">
+                                <small class="text-muted d-block">Time Left</small>
+                                <div class="fw-bold" id="countdown">
+                                    {% if auction.is_active %}
+                                    <span class="time-badge fs-6"><i class="fas fa-clock me-1"></i>{{ auction.end_time|date:"M d, Y H:i" }}</span>
+                                    {% else %}
+                                    <span class="badge badge-ended fs-6">Auction Ended</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded" style="background:var(--dropdown-hover);">
+                                <small class="text-muted d-block">Total Bids</small>
+                                <div class="fw-bold fs-5">{{ bids|length }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if auction.is_active %}
+                        {% if user.is_authenticated %}
+                            {% if user != auction.seller %}
+                            <div class="card border-0 mb-3" style="background:var(--dropdown-hover);">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-gavel me-2"></i>Place Your Bid</h6>
+                                    <form method="POST" action="{% url 'bid_create' slug=auction.slug %}">
+                                        {% csrf_token %}
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            {{ bid_form.amount }}
+                                            <button type="submit" class="btn btn-primary-custom text-white">
+                                                <i class="fas fa-gavel me-1"></i>Bid
+                                            </button>
+                                        </div>
+                                        <small class="text-muted mt-1 d-block">Must be higher than ${{ auction.current_price }}</small>
+                                    </form>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-info-circle me-1"></i> This is your auction. You cannot bid on your own items.
+                            </div>
+                            {% endif %}
+                        {% else %}
+                        <div class="text-center mb-3">
+                            <a href="{% url 'login' %}" class="btn btn-primary-custom text-white w-100">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login to Bid
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        {% if winner %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-trophy me-2"></i>
+                            <strong>Auction Won!</strong> Winner: {{ winner.username }}
+                        </div>
+                        {% if user == winner %}
+                        <a href="{% url 'process_payment' auction_slug=auction.slug %}" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-credit-card me-1"></i>Proceed to Payment
+                        </a>
+                        {% endif %}
+                        {% else %}
+                        <div class="alert alert-secondary">
+                            <i class="fas fa-info-circle me-1"></i> This auction ended with no bids.
+                        </div>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if user == auction.seller %}
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'auction_edit' slug=auction.slug %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i>Edit Auction
+                        </a>
+                        <a href="{% url 'auction_delete' slug=auction.slug %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i>Delete Auction
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

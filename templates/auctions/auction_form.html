@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="mb-4"><i class="fas fa-gavel me-2"></i>{{ title }}</h2>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Please correct the errors below:</strong>
+                        {{ form.errors }}
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">Title</label>
+                            <input type="text" name="title" class="form-control" id="{{ form.title.id_for_label }}" value="{{ form.title.value|default:'' }}" required>
+                            {% if form.title.errors %}
+                            <div class="text-danger small">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Description</label>
+                            <textarea name="description" class="form-control" id="{{ form.description.id_for_label }}" rows="5" required>{{ form.description.value|default:'' }}</textarea>
+                            {% if form.description.errors %}
+                            <div class="text-danger small">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.image.id_for_label }}" class="form-label fw-semibold">Image</label>
+                            <input type="file" name="image" class="form-control" id="{{ form.image.id_for_label }}" accept="image/*">
+                            {% if form.image.value %}
+                            <small class="text-muted">Current: {{ form.image.value }}</small>
+                            {% endif %}
+                            {% if form.image.errors %}
+                            <div class="text-danger small">{{ form.image.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label fw-semibold">Category</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                <div class="text-danger small">{{ form.category.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.starting_price.id_for_label }}" class="form-label fw-semibold">Starting Price ($)</label>
+                                <input type="number" name="starting_price" class="form-control" id="{{ form.starting_price.id_for_label }}" value="{{ form.starting_price.value|default:'' }}" step="0.01" min="0.01" required>
+                                {% if form.starting_price.errors %}
+                                <div class="text-danger small">{{ form.starting_price.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.reserve_price.id_for_label }}" class="form-label fw-semibold">Reserve Price ($) <small class="text-muted">(optional)</small></label>
+                            <input type="number" name="reserve_price" class="form-control" id="{{ form.reserve_price.id_for_label }}" value="{{ form.reserve_price.value|default:'' }}" step="0.01" min="0">
+                            {% if form.reserve_price.errors %}
+                            <div class="text-danger small">{{ form.reserve_price.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.start_time.id_for_label }}" class="form-label fw-semibold">Start Time</label>
+                                <input type="datetime-local" name="start_time" class="form-control" id="{{ form.start_time.id_for_label }}" value="{{ form.start_time.value|default:'' }}" required>
+                                {% if form.start_time.errors %}
+                                <div class="text-danger small">{{ form.start_time.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.end_time.id_for_label }}" class="form-label fw-semibold">End Time</label>
+                                <input type="datetime-local" name="end_time" class="form-control" id="{{ form.end_time.id_for_label }}" value="{{ form.end_time.value|default:'' }}" required>
+                                {% if form.end_time.errors %}
+                                <div class="text-danger small">{{ form.end_time.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if form.is_featured %}
+                        <div class="mb-3 form-check form-switch">
+                            <input type="checkbox" name="is_featured" class="form-check-input" id="{{ form.is_featured.id_for_label }}" {% if form.is_featured.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">Featured Auction</label>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary-custom text-white px-4">
+                                <i class="fas fa-save me-1"></i>{% if 'Edit' in title %}Update{% else %}Create{% endif %} Auction
+                            </button>
+                            <a href="{% url 'my_auctions' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

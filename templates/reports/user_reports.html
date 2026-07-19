@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}User Reports - AuctionHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="section-title mb-4"><i class="fas fa-users me-2"></i>User Reports</h2>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <h3 class="fw-bold text-primary">{{ users|length }}</h3>
+                        <p class="text-muted mb-0">Total Users</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <h3 class="fw-bold text-success">{{ users|length }}</h3>
+                        <p class="text-muted mb-0">Registered Members</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3">
+                        <h3 class="fw-bold text-info">--</h3>
+                        <p class="text-muted mb-0">Active Today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-3"><i class="fas fa-list me-2"></i>All Users</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Auctions</th>
+                            <th>Bids</th>
+                            <th>Payments</th>
+                            <th>Joined</th>
+                            <th>Staff</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <strong>{{ u.username }}</strong>
+                                {% if u == request.user %}
+                                <span class="badge bg-primary ms-1">You</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ u.get_full_name|default:"-" }}</td>
+                            <td><small>{{ u.email|default:"-" }}</small></td>
+                            <td><span class="badge bg-primary">{{ u.total_auctions }}</span></td>
+                            <td><span class="badge bg-warning text-dark">{{ u.total_bids }}</span></td>
+                            <td><span class="badge bg-success">{{ u.total_payments }}</span></td>
+                            <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                            <td>
+                                {% if u.is_staff %}
+                                <span class="badge bg-warning text-dark"><i class="fas fa-check"></i></span>
+                                {% else %}
+                                <span class="badge bg-secondary">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
